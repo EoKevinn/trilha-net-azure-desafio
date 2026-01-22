@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using Scalar.AspNetCore;
 using TrilhaNetAzureDesafio.Context;
+using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,20 +10,19 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<RHContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ConexaoPadrao")));
 
+builder.Services.AddOpenApi();
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Swagger
-app.UseSwagger();
-app.UseSwaggerUI();
+if (app.Environment.IsDevelopment())
+{
+    app.MapScalarApiReference();
+    app.MapOpenApi();
+}
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
 
 app.MapControllers();
 
